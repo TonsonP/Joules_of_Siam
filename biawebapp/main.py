@@ -115,18 +115,6 @@ app1.layout = html.Div(
 
         html.Div(
             id="left-column",
-            className="four columns",
-            children=[html.B('Electricity generation & consumption segmentation'), html.Hr(),
-                      # dcc.Graph(figure=pietype_generation_fig),
-                      # dcc.Graph(figure=consumption_sector),
-                      dcc.Graph(figure=figsubpie)]
-            + [html.Div(["initial child"], id="output-clientside",
-                        style={"display": "none"})],
-        ),
-
-        # Right column
-        html.Div(
-            id="right-column",
             className="eight columns",
             children=[
                 # test prediction
@@ -149,6 +137,18 @@ app1.layout = html.Div(
                 #     ],
                 # ),
             ],
+        ),
+        
+        # Right column
+        html.Div(
+            id="right-column",
+            className="four columns",
+            children=[html.B('Electricity generation & consumption segmentation'), html.Hr(),
+                      # dcc.Graph(figure=pietype_generation_fig),
+                      # dcc.Graph(figure=consumption_sector),
+                      dcc.Graph(figure=figsubpie)]
+            + [html.Div(["initial child"], id="output-clientside",
+                        style={"display": "none"})],
         ),
     ],
 )

@@ -38,6 +38,8 @@ pietype_generation_fig.update_layout(
     title=dict(text="Electricity generation Group by type",
                font=dict(size=20), automargin=True, yref='paper')
 )
+prediction_allmodelfig = px.line(test2, x="Date", y=test2.columns[1:]).add_scatter(
+    x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
 
 # Route of our web
 
@@ -109,8 +111,8 @@ app1.layout = html.Div(
                     children=[
                         html.B("Energy Prediction"),
                         html.Hr(),
-                        dcc.Graph(figure=px.line(test2, x="Date", y=test2.columns[1:]).add_scatter(
-                            x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b')), id="forcastmultimd"),
+                        dcc.Graph(figure=prediction_allmodelfig,
+                                  id="forcastmultimd"),
                     ],
                 ),
                 # Patient Wait time by Department

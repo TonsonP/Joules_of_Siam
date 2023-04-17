@@ -26,7 +26,10 @@ def calculate_electricity_charge(monthly_usage, ft_rate):
         base_tariff = 15 * tariff_0_15 + 10 * tariff_16_25 + 10 * tariff_26_35 + 65 * tariff_36_100 + 50 * tariff_101_150 + (monthly_usage - 150) * tariff_151_400
     else:
         base_tariff = 15 * tariff_0_15 + 10 * tariff_16_25 + 10 * tariff_26_35 + 65 * tariff_36_100 + 50 * tariff_101_150 + 250 * tariff_151_400 + (monthly_usage - 400) * tariff_above_400
-        
+
+    service_charge = 8.19
+    base_tariff = base_tariff + service_charge
+
     # Calculate the Ft charge
     ft_charge = monthly_usage * ft_rate
     

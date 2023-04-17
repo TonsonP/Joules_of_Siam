@@ -6,6 +6,7 @@ import pandas as pd
 import pickle
 from flask import Flask, render_template, redirect, url_for, flash, request, send_from_directory
 from flask_bootstrap import Bootstrap
+import plotly.graph_objects as go
 # from flask_ckeditor import CKEditor
 
 # import flask
@@ -18,31 +19,52 @@ app1 = dash.Dash(requests_pathname_prefix="/app1/")
 app2 = dash.Dash(requests_pathname_prefix="/app2/")
 
 # Data for web load preparing
-file = open('dataP/Actual_values.pkl', 'rb')
-actial_values = pickle.load(file)
-test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
+with open('dataP/Actual_values.pkl', 'rb') as file:
+    actial_values = pickle.load(file)
 
+with open('dataP/df_generation_type_2022.pkl', 'rb') as file:
+    df_generation_type_2022 = pickle.load(file)
+
+with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
+    df_consumption_2022 = pickle.load(file)
+
+# This still temp
+test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
+labels = df_generation_type_2022.index[0:7]
+values = df_generation_type_2022[0:7]
+
+pietype_generation_fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+pietype_generation_fig.update_layout(
+    title=dict(text="Electricity generation Group by type",
+               font=dict(size=20), automargin=True, yref='paper')
+)
 
 # Route of our web
+
+
 @server.route("/")
 def home():
     return render_template('index.html')
     # return "Hello, Flask!"
+
 
 @server.route("/data_")
 def data_():
     return render_template('left-sidebar.html')
     # return "Hello, Flask!"
 
+
 @server.route("/analysis_")
 def analysis_():
     return render_template('right-sidebar.html')
     # return "Hello, Flask!"
 
+
 @server.route("/aboutus")
 def aboutus():
     return render_template('no-sidebar.html')
     # return "Hello, Flask!"
+
 
 @server.route('/render_dashboard')
 def render_dashboard():
@@ -65,16 +87,17 @@ app1.layout = html.Div(
             children=[html.Img(src=app1.get_asset_url("plotly_logo.png"))],
         ),
         # Left column
+
         html.Div(
             id="left-column",
             className="four columns",
-            children=[html.B('testtesttest')]
-            + [
-                html.Div(
-                    ["initial child"], id="output-clientside", style={"display": "none"}
-                )
-            ],
+            children=[html.B('testtesttest'), html.Hr(),
+                      dcc.Graph(figure=pietype_generation_fig)
+                      ]
+            + [html.Div(["initial child"], id="output-clientside",
+                        style={"display": "none"})],
         ),
+
         # Right column
         html.Div(
             id="right-column",

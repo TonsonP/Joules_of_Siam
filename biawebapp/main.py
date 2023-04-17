@@ -32,7 +32,7 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
 
 with open('dataP/df_consumption_month_2022.pkl', 'rb') as file:
     df_month_2022 = pickle.load(file)
-
+# check
 # This still temp
 # test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
 

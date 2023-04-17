@@ -7,6 +7,7 @@ import pickle
 from flask import Flask, render_template, redirect, url_for, flash, request, send_from_directory
 from flask_bootstrap import Bootstrap
 import plotly.graph_objects as go
+from forecast_function import forecasting
 # from flask_ckeditor import CKEditor
 
 # import flask
@@ -29,7 +30,7 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
     df_consumption_2022 = pickle.load(file)
 
 # This still temp
-test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
+# test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
 
 
 # Figure for dashboard
@@ -54,7 +55,9 @@ consumption_sector.update_layout(
 )
 
 # model comsumption prediction
-prediction_allmodelfig = px.line(test2, x="Date", y=test2.columns[1:]).add_scatter(
+forecast = forecasting(GDP_percent=2, Population_percent=0.05, CPI_percent=2)
+#fig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
+prediction_allmodelfig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:]).add_scatter(
     x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
 
 

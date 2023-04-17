@@ -24,7 +24,6 @@ pyperclip3==0.4.1
 pandas
 scipy
 scikit-learn
-sklearn
+xgboost
 plotly
 dash
-dash_html_components

@@ -6,7 +6,7 @@ import pandas as pd
 import pickle
 from flask import Flask, render_template, redirect, url_for, flash, request, send_from_directory
 from flask_bootstrap import Bootstrap
-from flask_ckeditor import CKEditor
+# from flask_ckeditor import CKEditor
 
 # import flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware

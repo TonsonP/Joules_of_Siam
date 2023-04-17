@@ -30,20 +30,35 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
 
 # This still temp
 test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
+
+
+# Figure for dashboard
+
+# Electricity generation Group by type
 labels = df_generation_type_2022.index[0:7]
 values = df_generation_type_2022[0:7]
 
 pietype_generation_fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
 pietype_generation_fig.update_layout(
     title=dict(text="Electricity generation Group by type",
+               font=dict(size=20), automargin=False, yref='paper')
+)
+
+# Electricity consumption Group by sector
+labels = df_consumption_2022.index[2:7]
+values = df_consumption_2022[2:7]
+consumption_sector = go.Figure(data=[go.Pie(labels=labels, values=values)])
+consumption_sector.update_layout(
+    title=dict(text="Electricity consumption Group by sector",
                font=dict(size=20), automargin=True, yref='paper')
 )
+
+# model comsumption prediction
 prediction_allmodelfig = px.line(test2, x="Date", y=test2.columns[1:]).add_scatter(
     x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
 
+
 # Route of our web
-
-
 @server.route("/")
 def home():
     return render_template('index.html')
@@ -94,8 +109,7 @@ app1.layout = html.Div(
             id="left-column",
             className="four columns",
             children=[html.B('testtesttest'), html.Hr(),
-                      dcc.Graph(figure=pietype_generation_fig)
-                      ]
+                      dcc.Graph(figure=pietype_generation_fig), html.Hr(), dcc.Graph(figure=consumption_sector)]
             + [html.Div(["initial child"], id="output-clientside",
                         style={"display": "none"})],
         ),

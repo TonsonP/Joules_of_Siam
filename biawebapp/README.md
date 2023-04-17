@@ -25,4 +25,4 @@
   - run script cmd`conda create --name biaweb python=3.10`
   - `conda activate biaweb`
   - `pip install -r requirement.txt`
-  - Then run the `main.py` **being in same directory of main.py is required**
+  - Run the `main.py`, **being in same directory of main.py is required**

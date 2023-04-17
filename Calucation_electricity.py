@@ -38,3 +38,6 @@ def calculate_electricity_charge(monthly_usage, ft_rate):
     
     return total_bill
 
+if __name__ == '__main__':
+    total_bill = calculate_electricity_charge(1000,2)
+    print(total_bill)

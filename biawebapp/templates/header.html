@@ -12,3 +12,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="{{url_for('static',filename = 'assets/css/main.css')}}" />
 </head>
+
+<body class="is-preload homepage">
+    <div id="page-wrapper">
+        <!-- Header -->
+        <div id="header-wrapper">
+            <header id="header" class="container">
+
+                <!-- Logo -->
+                <div id="logo">
+                    <h1><a href="#">Joule of Siam</a></h1>
+                    <!-- <span></span> -->
+                </div>
+
+                <!-- Nav -->
+                <nav id="nav">
+                    <ul>
+                        <li class="current"><a href="{{url_for('home')}}">homepage</a></li>
+
+                        <li>
+                            <a href="#">Region</a>
+                            <ul>
+                                <li><a href="#">Northern Thailand</a></li>
+                                <li><a href="#">Northeastern Thailand</a></li>
+                                <li><a href="#">Western Thailand</a></li>
+                                <li><a href="#">Central Thailand</a></li>
+                                <li><a href="#">Eastern Thailand</a></li>
+                                <li><a href="#">Southern Thailand</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="{{url_for('data_')}}">data</a></li>
+                        <li><a href="{{url_for('analysis_')}}">analysis</a></li>
+                        <li><a href="{{url_for('aboutus')}}">about</a></li>
+                    </ul>
+                </nav>
+
+            </header>
+        </div>

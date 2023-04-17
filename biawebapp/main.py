@@ -1,10 +1,10 @@
 import dash
-from dash import html, dcc,Output, Input
+from dash import html, dcc, Output, Input
 import flask
 import plotly.express as px
 import pandas as pd
 import pickle
-from flask import Flask,render_template, redirect, url_for, flash,request,send_from_directory
+from flask import Flask, render_template, redirect, url_for, flash, request, send_from_directory
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 
@@ -12,28 +12,49 @@ from flask_ckeditor import CKEditor
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.serving import run_simple
 
+# Server and Dashboard web app
 server = flask.Flask(__name__)
+app1 = dash.Dash(requests_pathname_prefix="/app1/")
+app2 = dash.Dash(requests_pathname_prefix="/app2/")
 
-
+# Data for web load preparing
 file = open('dataP/Actual_values.pkl', 'rb')
 actial_values = pickle.load(file)
 test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
 
+
+# Route of our web
 @server.route("/")
 def home():
     return render_template('index.html')
-    return "Hello, Flask!"
+    # return "Hello, Flask!"
+
+@server.route("/data_")
+def data_():
+    return render_template('left-sidebar.html')
+    # return "Hello, Flask!"
+
+@server.route("/analysis_")
+def analysis_():
+    return render_template('right-sidebar.html')
+    # return "Hello, Flask!"
+
+@server.route("/aboutus")
+def aboutus():
+    return render_template('no-sidebar.html')
+    # return "Hello, Flask!"
 
 @server.route('/render_dashboard')
 def render_dashboard():
     return flask.redirect('/app1')
 
+
 @server.route('/render_dashboard2')
 def render_dashboard2():
     return flask.redirect('/app2')
 
-app1 = dash.Dash(requests_pathname_prefix="/app1/")
 
+# DashApp Layout
 app1.layout = html.Div(
     id="app-container",
     children=[
@@ -65,7 +86,8 @@ app1.layout = html.Div(
                     children=[
                         html.B("Energy Prediction"),
                         html.Hr(),
-                        dcc.Graph(figure=px.line(test2, x="Date", y=test2.columns[1:]).add_scatter(x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b')),id="forcastmultimd"),
+                        dcc.Graph(figure=px.line(test2, x="Date", y=test2.columns[1:]).add_scatter(
+                            x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b')), id="forcastmultimd"),
                     ],
                 ),
                 # Patient Wait time by Department
@@ -93,11 +115,9 @@ app1.layout = html.Div(
 #     fig = px.line(test2, x="Date", y=test2.columns[1:])
 #     fig.add_scatter(x=actial_values.index.values, y=actial_values["Peak"].values, name='Actual',
 #                     line=dict(color='#8a938b'))
-    # return fig
+# return fig
 
 
-
-app2 = dash.Dash(requests_pathname_prefix="/app2/")
 app2.layout = html.Div("Hello, Dash app 2!")
 
 application = DispatcherMiddleware(
@@ -106,5 +126,6 @@ application = DispatcherMiddleware(
 )
 
 if __name__ == "__main__":
-    run_simple("localhost", 8050, application,use_reloader=True, use_debugger=True)
+    run_simple("localhost", 8050, application,
+               use_reloader=True, use_debugger=True)
     #    app.run_server(debug=True)

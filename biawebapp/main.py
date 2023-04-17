@@ -64,6 +64,11 @@ figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
 fig_month = px.bar(df_month_2022[df_month_2022["Year"] == 2022], x='Month', y='Grand Total',
              hover_data=df_month_2022.columns[2:-1].values, color='Residential',
              labels={'pop':'Consumption seperated by month'}, height=400)
+fig_month.update_layout(
+    title=dict(text="Consumption seperated by month",
+               font=dict(size=20), automargin=False, yref='paper')
+)
+
 
 # model comsumption prediction
 forecast = forecasting(GDP_percent=2, Population_percent=0.05, CPI_percent=2)

@@ -34,7 +34,7 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
 with open('dataP/df_consumption_month_2022.pkl', 'rb') as file:
     df_month_2022 = pickle.load(file)
 
-FT_prediction = pd.read_csv("Joules_of_Siam/biawebapp/dataP/FT_full.csv")
+FT_prediction = pd.read_csv("dataP/FT_full.csv")
 FT_prediction['Date'] = pd.to_datetime(FT_prediction['Date'])
 FT_prediction.set_index("Date", inplace=True)
 # check
@@ -67,8 +67,9 @@ figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
                     name='Electricity consumption Group by sector', hole=0.7), row=1, col=2)
 
 fig_month = px.bar(df_month_2022[df_month_2022["Year"] == 2022], x='Month', y='Grand Total',
-             hover_data=df_month_2022.columns[2:-1].values, color='Residential',
-             labels={'pop':'Consumption seperated by month'}, height=400)
+                   hover_data=df_month_2022.columns[2:-
+                                                    1].values, color='Residential',
+                   labels={'pop': 'Consumption seperated by month'}, height=400)
 fig_month.update_layout(
     title=dict(text="Consumption seperated by month",
                font=dict(size=20), automargin=False, yref='paper')
@@ -141,11 +142,14 @@ app1.layout = html.Div(
                         html.B("Energy Prediction"),
                         html.Hr(),
                         html.P('GDP_input_value'),
-                        dcc.Input(id="GDP_input_value", type="number", placeholder="GDP growth in percentage", value=2),
+                        dcc.Input(id="GDP_input_value", type="number",
+                                  placeholder="GDP growth in percentage", value=2),
                         html.P('Population_input_value'),
-                        dcc.Input(id="Population_input_value", type="number", placeholder="Population growth in percentage", value=0.05),
+                        dcc.Input(id="Population_input_value", type="number",
+                                  placeholder="Population growth in percentage", value=0.05),
                         html.P('CPI_input_value'),
-                        dcc.Input(id="CPI_input_value", type="number", placeholder="CPI growth in percentage", value=2),
+                        dcc.Input(id="CPI_input_value", type="number",
+                                  placeholder="CPI growth in percentage", value=2),
                         dcc.Graph(figure=px.line(),
                                   id="forcastmultimd", responsive=True),
                     ],
@@ -170,18 +174,23 @@ app1.layout = html.Div(
                       # dcc.Graph(figure=pietype_generation_fig),
                       # dcc.Graph(figure=consumption_sector),
                       dcc.Graph(figure=figsubpie),
-                    
-                      dcc.Dropdown( id = 'fig_month_dropdown',
-                        options = [
-                            {'label': 'Residential', 'value':'Residential' },
-                            {'label': 'Business',    'value':'Business'},
-                            {'label': 'Industrial',  'value':'Industrial'},
-                            {'label': 'Government',  'value':'Government and Non-Profit'},
-                            {'label': 'Other sector','value':'Other sector'}
-                            ],
-                        value = 'Residential'),
-                        html.Button('Submit', id='submit-val', n_clicks=0),
-                      #dcc.Graph(figure=fig_month)]
+
+                      dcc.Dropdown(id='fig_month_dropdown',
+                                   options=[
+                                       {'label': 'Residential',
+                                           'value': 'Residential'},
+                                       {'label': 'Business',
+                                        'value': 'Business'},
+                                       {'label': 'Industrial',
+                                        'value': 'Industrial'},
+                                       {'label': 'Government',
+                                        'value': 'Government and Non-Profit'},
+                                       {'label': 'Other sector',
+                                           'value': 'Other sector'}
+                                   ],
+                                   value='Residential'),
+                      html.Button('Submit', id='submit-val', n_clicks=0),
+                      # dcc.Graph(figure=fig_month)]
                       dcc.Graph(figure=px.bar(), id='fig_month_id')]
             + [html.Div(["initial child"], id="output-clientside",
                         style={"display": "none"})],
@@ -189,41 +198,44 @@ app1.layout = html.Div(
     ],
 )
 
+
 @app1.callback(Output(component_id='fig_month_id', component_property='figure'),
                Input(component_id='submit-val', component_property='n_clicks'),
-            State(component_id='fig_month_dropdown', component_property= 'value'))
+               State(component_id='fig_month_dropdown', component_property='value'))
 def Update_month_by_sector(n_clicks, fig_month_dropdown):
 
     print('Fig dropdown values')
     print(fig_month_dropdown)
 
     fig_month = px.bar(df_month_2022[df_month_2022["Year"] == 2022], x='Month', y='Grand Total',
-             hover_data=df_month_2022.columns[2:-1].values, color=fig_month_dropdown,
-             labels={'pop':'Consumption seperated by month'}, height=400)
+                       hover_data=df_month_2022.columns[2:-
+                                                        1].values, color=fig_month_dropdown,
+                       labels={'pop': 'Consumption seperated by month'}, height=400)
     fig_month.update_layout(
         title=dict(text="Consumption seperated by month",
-                font=dict(size=20), automargin=False, yref='paper')
-)
+                   font=dict(size=20), automargin=False, yref='paper')
+    )
 
     return fig_month
 
 
-
-@app1.callback(Output(component_id='forcastmultimd', component_property= 'figure'),
-              [Input(component_id='GDP_input_value', component_property= 'value'), 
-               Input(component_id='CPI_input_value', component_property= 'value'),
-               Input(component_id='Population_input_value', component_property= 'value')]
-            )
+@app1.callback(Output(component_id='forcastmultimd', component_property='figure'),
+               [Input(component_id='GDP_input_value', component_property='value'),
+               Input(component_id='CPI_input_value',
+                     component_property='value'),
+               Input(component_id='Population_input_value', component_property='value')]
+               )
 def Update_forecast(GDP_input_value, CPI_input_value, Population_input_value):
 
-
     # model comsumption prediction
-    forecast = forecasting(GDP_percent=GDP_input_value, Population_percent=Population_input_value, CPI_percent=CPI_input_value)
+    forecast = forecasting(GDP_percent=GDP_input_value,
+                           Population_percent=Population_input_value, CPI_percent=CPI_input_value)
     #fig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
-    prediction_allmodelfig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
-    prediction_allmodelfig.add_scatter(x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
-    
-    
+    prediction_allmodelfig = px.line(
+        forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
+    prediction_allmodelfig.add_scatter(
+        x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
+
     return prediction_allmodelfig
 
 
@@ -254,27 +266,14 @@ app2.layout = html.Div(
                                   id="FT_predict", responsive=True),
                     ],
                 ),
-               
+
             ],
         ),
-            # + [html.Div(["initial child"], id="output-clientside",
-            #             style={"display": "none"})],
-        
+        # + [html.Div(["initial child"], id="output-clientside",
+        #             style={"display": "none"})],
+
     ],
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 application = DispatcherMiddleware(

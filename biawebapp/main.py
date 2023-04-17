@@ -30,6 +30,9 @@ with open('dataP/df_generation_type_2022.pkl', 'rb') as file:
 with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
     df_consumption_2022 = pickle.load(file)
 
+with open('dataP/df_consumption_month_2022.pkl', 'rb') as file:
+    df_month_2022 = pickle.load(file)
+
 # This still temp
 # test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
 
@@ -57,6 +60,10 @@ consumption_sector.update_layout(
 )
 figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
                     name='Electricity consumption Group by sector'), row=1, col=2)
+
+fig_month = px.bar(df_month_2022[df_month_2022["Year"] == 2022], x='Month', y='Grand Total',
+             hover_data=df_month_2022.columns[2:-1].values, color='Residential',
+             labels={'pop':'Consumption seperated by month'}, height=400)
 
 # model comsumption prediction
 forecast = forecasting(GDP_percent=2, Population_percent=0.05, CPI_percent=2)
@@ -137,7 +144,7 @@ app1.layout = html.Div(
                 # ),
             ],
         ),
-        
+
         # Right column
         html.Div(
             id="right-column",
@@ -145,10 +152,11 @@ app1.layout = html.Div(
             children=[html.B('Electricity generation & consumption segmentation'), html.Hr(),
                       # dcc.Graph(figure=pietype_generation_fig),
                       # dcc.Graph(figure=consumption_sector),
-                      dcc.Graph(figure=figsubpie)]
+                      dcc.Graph(figure=figsubpie),
+                      dcc.Graph(figure=fig_month)]
             + [html.Div(["initial child"], id="output-clientside",
                         style={"display": "none"})],
-        ),
+        )
     ],
 )
 

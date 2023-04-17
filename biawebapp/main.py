@@ -34,7 +34,7 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
 with open('dataP/df_consumption_month_2022.pkl', 'rb') as file:
     df_month_2022 = pickle.load(file)
 
-FT_prediction = pd.read_csv("/root/projects/Joules_of_Siam/biawebapp/dataP/FT_full.csv")
+FT_prediction = pd.read_csv("Joules_of_Siam/biawebapp/dataP/FT_full.csv")
 FT_prediction['Date'] = pd.to_datetime(FT_prediction['Date'])
 FT_prediction.set_index("Date", inplace=True)
 # check

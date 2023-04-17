@@ -7,6 +7,7 @@ import pickle
 from flask import Flask, render_template, redirect, url_for, flash, request, send_from_directory
 from flask_bootstrap import Bootstrap
 import plotly.graph_objects as go
+from forecast_function import forecasting
 # from flask_ckeditor import CKEditor
 
 # import flask
@@ -29,21 +30,38 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
     df_consumption_2022 = pickle.load(file)
 
 # This still temp
-test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
+# test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
+
+
+# Figure for dashboard
+
+# Electricity generation Group by type
 labels = df_generation_type_2022.index[0:7]
 values = df_generation_type_2022[0:7]
 
 pietype_generation_fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
 pietype_generation_fig.update_layout(
     title=dict(text="Electricity generation Group by type",
+               font=dict(size=20), automargin=False, yref='paper')
+)
+
+# Electricity consumption Group by sector
+labels = df_consumption_2022.index[2:7]
+values = df_consumption_2022[2:7]
+consumption_sector = go.Figure(data=[go.Pie(labels=labels, values=values)])
+consumption_sector.update_layout(
+    title=dict(text="Electricity consumption Group by sector",
                font=dict(size=20), automargin=True, yref='paper')
 )
-prediction_allmodelfig = px.line(test2, x="Date", y=test2.columns[1:]).add_scatter(
+
+# model comsumption prediction
+forecast = forecasting(GDP_percent=2, Population_percent=0.05, CPI_percent=2)
+#fig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
+prediction_allmodelfig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:]).add_scatter(
     x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
 
+
 # Route of our web
-
-
 @server.route("/")
 def home():
     return render_template('index.html')
@@ -94,8 +112,7 @@ app1.layout = html.Div(
             id="left-column",
             className="four columns",
             children=[html.B('testtesttest'), html.Hr(),
-                      dcc.Graph(figure=pietype_generation_fig)
-                      ]
+                      dcc.Graph(figure=pietype_generation_fig), html.Hr(), dcc.Graph(figure=consumption_sector)]
             + [html.Div(["initial child"], id="output-clientside",
                         style={"display": "none"})],
         ),

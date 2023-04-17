@@ -8,8 +8,9 @@ from flask import Flask, render_template, redirect, url_for, flash, request, sen
 from flask_bootstrap import Bootstrap
 import plotly.graph_objects as go
 from forecast_function import forecasting
-# from flask_ckeditor import CKEditor
+from plotly.subplots import make_subplots
 
+# from flask_ckeditor import CKEditor
 # import flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.serving import run_simple
@@ -34,64 +35,67 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
 
 
 # Figure for dashboard
+figsubpie = make_subplots(rows=1, cols=2, subplot_titles=('Electricity generation Group by type', 'Electricity  consumption Group by sector'), specs=[
+                          [{'type': 'pie'}, {'type': 'pie'}]])
 
 # Electricity generation Group by type
 labels = df_generation_type_2022.index[0:7]
 values = df_generation_type_2022[0:7]
 
 pietype_generation_fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
-pietype_generation_fig.update_layout(
-    title=dict(text="Electricity generation Group by type",
-               font=dict(size=20), automargin=False, yref='paper')
-)
-
+pietype_generation_fig.update_layout(title=dict(text='Electricity generation Group by type', font=dict(size=20), automargin=False, yref='paper')
+                                     )
+figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
+                    name='Electricity generation Group by type'), row=1, col=1)
 # Electricity consumption Group by sector
 labels = df_consumption_2022.index[2:7]
 values = df_consumption_2022[2:7]
 consumption_sector = go.Figure(data=[go.Pie(labels=labels, values=values)])
 consumption_sector.update_layout(
     title=dict(text="Electricity consumption Group by sector",
-               font=dict(size=20), automargin=True, yref='paper')
+               font=dict(size=20), automargin=False, yref='paper')
 )
+figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
+                    name='Electricity consumption Group by sector'), row=1, col=2)
 
 # model comsumption prediction
 forecast = forecasting(GDP_percent=2, Population_percent=0.05, CPI_percent=2)
-#fig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
+# fig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
 prediction_allmodelfig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:]).add_scatter(
     x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
 
 
 # Route of our web
-@server.route("/")
+@ server.route("/")
 def home():
     return render_template('index.html')
     # return "Hello, Flask!"
 
 
-@server.route("/data_")
+@ server.route("/data_")
 def data_():
     return render_template('left-sidebar.html')
     # return "Hello, Flask!"
 
 
-@server.route("/analysis_")
+@ server.route("/analysis_")
 def analysis_():
     return render_template('right-sidebar.html')
     # return "Hello, Flask!"
 
 
-@server.route("/aboutus")
+@ server.route("/aboutus")
 def aboutus():
     return render_template('no-sidebar.html')
     # return "Hello, Flask!"
 
 
-@server.route('/render_dashboard')
+@ server.route('/render_dashboard')
 def render_dashboard():
     return flask.redirect('/app1')
 
 
-@server.route('/render_dashboard2')
+@ server.route('/render_dashboard2')
 def render_dashboard2():
     return flask.redirect('/app2')
 
@@ -111,8 +115,10 @@ app1.layout = html.Div(
         html.Div(
             id="left-column",
             className="four columns",
-            children=[html.B('testtesttest'), html.Hr(),
-                      dcc.Graph(figure=pietype_generation_fig), html.Hr(), dcc.Graph(figure=consumption_sector)]
+            children=[html.B('Electricity generation & consumption segmentation'), html.Hr(),
+                      # dcc.Graph(figure=pietype_generation_fig),
+                      # dcc.Graph(figure=consumption_sector),
+                      dcc.Graph(figure=figsubpie)]
             + [html.Div(["initial child"], id="output-clientside",
                         style={"display": "none"})],
         ),

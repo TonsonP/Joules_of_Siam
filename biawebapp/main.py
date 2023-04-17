@@ -1,5 +1,5 @@
 import dash
-from dash import html, dcc, Output, Input
+from dash import html, dcc, Output, Input, State
 import flask
 import plotly.express as px
 import pandas as pd
@@ -9,6 +9,7 @@ from flask_bootstrap import Bootstrap
 import plotly.graph_objects as go
 from forecast_function import forecasting
 from plotly.subplots import make_subplots
+from Calucation_electricity import calculate_electricity_charge
 
 # from flask_ckeditor import CKEditor
 # import flask
@@ -32,6 +33,10 @@ with open('dataP/df_generation_sector_2022.pkl', 'rb') as file:
 
 with open('dataP/df_consumption_month_2022.pkl', 'rb') as file:
     df_month_2022 = pickle.load(file)
+
+FT_prediction = pd.read_csv("/root/projects/Joules_of_Siam/biawebapp/dataP/FT_full.csv")
+FT_prediction['Date'] = pd.to_datetime(FT_prediction['Date'])
+FT_prediction.set_index("Date", inplace=True)
 # check
 # This still temp
 # test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
@@ -49,7 +54,7 @@ pietype_generation_fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
 pietype_generation_fig.update_layout(title=dict(text='Electricity generation Group by type', font=dict(size=20), automargin=False, yref='paper')
                                      )
 figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
-                    name='Electricity generation Group by type'), row=1, col=1)
+                    name='Electricity generation Group by type', hole=0.7), row=1, col=1)
 # Electricity consumption Group by sector
 labels = df_consumption_2022.index[2:7]
 values = df_consumption_2022[2:7]
@@ -59,7 +64,7 @@ consumption_sector.update_layout(
                font=dict(size=20), automargin=False, yref='paper')
 )
 figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
-                    name='Electricity consumption Group by sector'), row=1, col=2)
+                    name='Electricity consumption Group by sector', hole=0.7), row=1, col=2)
 
 fig_month = px.bar(df_month_2022[df_month_2022["Year"] == 2022], x='Month', y='Grand Total',
              hover_data=df_month_2022.columns[2:-1].values, color='Residential',
@@ -135,8 +140,14 @@ app1.layout = html.Div(
                     children=[
                         html.B("Energy Prediction"),
                         html.Hr(),
-                        dcc.Graph(figure=prediction_allmodelfig,
-                                  id="forcastmultimd"),
+                        html.P('GDP_input_value'),
+                        dcc.Input(id="GDP_input_value", type="number", placeholder="GDP growth in percentage", value=2),
+                        html.P('Population_input_value'),
+                        dcc.Input(id="Population_input_value", type="number", placeholder="Population growth in percentage", value=0.05),
+                        html.P('CPI_input_value'),
+                        dcc.Input(id="CPI_input_value", type="number", placeholder="CPI growth in percentage", value=2),
+                        dcc.Graph(figure=px.line(),
+                                  id="forcastmultimd", responsive=True),
                     ],
                 ),
                 # Patient Wait time by Department
@@ -159,28 +170,112 @@ app1.layout = html.Div(
                       # dcc.Graph(figure=pietype_generation_fig),
                       # dcc.Graph(figure=consumption_sector),
                       dcc.Graph(figure=figsubpie),
-                      dcc.Graph(figure=fig_month)]
+                    
+                      dcc.Dropdown( id = 'fig_month_dropdown',
+                        options = [
+                            {'label': 'Residential', 'value':'Residential' },
+                            {'label': 'Business',    'value':'Business'},
+                            {'label': 'Industrial',  'value':'Industrial'},
+                            {'label': 'Government',  'value':'Government and Non-Profit'},
+                            {'label': 'Other sector','value':'Other sector'}
+                            ],
+                        value = 'Residential'),
+                        html.Button('Submit', id='submit-val', n_clicks=0),
+                      #dcc.Graph(figure=fig_month)]
+                      dcc.Graph(figure=px.bar(), id='fig_month_id')]
             + [html.Div(["initial child"], id="output-clientside",
                         style={"display": "none"})],
         )
     ],
 )
 
+@app1.callback(Output(component_id='fig_month_id', component_property='figure'),
+               Input(component_id='submit-val', component_property='n_clicks'),
+            State(component_id='fig_month_dropdown', component_property= 'value'))
+def Update_month_by_sector(n_clicks, fig_month_dropdown):
 
-# @app1.callback(
-#     Output("forcastmultimd", "figure"),
-# )
-# def forcastingPred():
-#     # import plotly.express as px
+    print('Fig dropdown values')
+    print(fig_month_dropdown)
 
-#     # df = px.data.gapminder().query("continent=='Oceania'")
-#     fig = px.line(test2, x="Date", y=test2.columns[1:])
-#     fig.add_scatter(x=actial_values.index.values, y=actial_values["Peak"].values, name='Actual',
-#                     line=dict(color='#8a938b'))
-# return fig
+    fig_month = px.bar(df_month_2022[df_month_2022["Year"] == 2022], x='Month', y='Grand Total',
+             hover_data=df_month_2022.columns[2:-1].values, color=fig_month_dropdown,
+             labels={'pop':'Consumption seperated by month'}, height=400)
+    fig_month.update_layout(
+        title=dict(text="Consumption seperated by month",
+                font=dict(size=20), automargin=False, yref='paper')
+)
+
+    return fig_month
 
 
-app2.layout = html.Div("Hello, Dash app 2!")
+
+@app1.callback(Output(component_id='forcastmultimd', component_property= 'figure'),
+              [Input(component_id='GDP_input_value', component_property= 'value'), 
+               Input(component_id='CPI_input_value', component_property= 'value'),
+               Input(component_id='Population_input_value', component_property= 'value')]
+            )
+def Update_forecast(GDP_input_value, CPI_input_value, Population_input_value):
+
+
+    # model comsumption prediction
+    forecast = forecasting(GDP_percent=GDP_input_value, Population_percent=Population_input_value, CPI_percent=CPI_input_value)
+    #fig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
+    prediction_allmodelfig = px.line(forecast.plotting_value, x="Date", y=forecast.plotting_value.columns[1:])
+    prediction_allmodelfig.add_scatter(x=actial_values.index.values[130:], y=actial_values["Peak"][130:].values, name='Actual', line=dict(color='#8a938b'))
+    
+    
+    return prediction_allmodelfig
+
+
+#app2.layout = html.Div("Hello, Dash app 2!")
+app2.layout = html.Div(
+    id="app-container",
+    children=[
+        # Banner
+        html.Div(
+            id="banner",
+            className="banner",
+            children=[
+                html.Img(src=app2.get_asset_url("JouleofSiam_logo.png"))],
+        ),
+        # Left column
+
+        html.Div(
+            id="left-column",
+            className="eight columns",
+            children=[
+                # test prediction
+                html.Div(
+                    id="FT predict",
+                    children=[
+                        html.B("FT Prediction"),
+                        html.Hr(),
+                        dcc.Graph(figure=px.line(FT_prediction, x=FT_prediction.index.values[0:], y=FT_prediction["FT"].iloc[0:]),
+                                  id="FT_predict", responsive=True),
+                    ],
+                ),
+               
+            ],
+        ),
+            # + [html.Div(["initial child"], id="output-clientside",
+            #             style={"display": "none"})],
+        
+    ],
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 application = DispatcherMiddleware(
     server,

@@ -115,7 +115,8 @@ app1.layout = html.Div(
         html.Div(
             id="banner",
             className="banner",
-            children=[html.Img(src=app1.get_asset_url("plotly_logo.png"))],
+            children=[
+                html.Img(src=app1.get_asset_url("JouleofSiam_logo.png"))],
         ),
         # Left column
 

@@ -63,6 +63,7 @@ consumption_sector.update_layout(
     title=dict(text="Electricity consumption Group by sector",
                font=dict(size=20), automargin=False, yref='paper')
 )
+#check
 figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
                     name='Electricity consumption Group by sector', hole=0.7), row=1, col=2)
 

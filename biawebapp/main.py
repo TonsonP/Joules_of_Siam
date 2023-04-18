@@ -155,7 +155,7 @@ app1.layout = html.Div(
                         html.P('CPI_input_value'),
                         dcc.Input(id="CPI_input_value", type="number",
                                   placeholder="CPI growth in percentage", value=2),
-                        dcc.Graph(figure=px.line(),
+                        dcc.Graph(figure=prediction_allmodelfig,
                                   id="forcastmultimd", responsive=True),
                     ],
                 ),
@@ -180,23 +180,23 @@ app1.layout = html.Div(
                       # dcc.Graph(figure=consumption_sector),
                       dcc.Graph(figure=figsubpie),
 
-                      dcc.Dropdown(id='fig_month_dropdown',
-                                   options=[
-                                       {'label': 'Residential',
-                                           'value': 'Residential'},
-                                       {'label': 'Business',
-                                        'value': 'Business'},
-                                       {'label': 'Industrial',
-                                        'value': 'Industrial'},
-                                       {'label': 'Government',
-                                        'value': 'Government and Non-Profit'},
-                                       {'label': 'Other sector',
-                                           'value': 'Other sector'}
-                                   ],
-                                   value='Residential'),
-                      html.Button('Submit', id='submit-val', n_clicks=0),
+
                       # dcc.Graph(figure=fig_month)]
-                      dcc.Graph(figure=px.bar(), id='fig_month_id')]
+                      dcc.Graph(figure=prediction_allmodelfig, id='fig_month_id'),                      dcc.Dropdown(id='fig_month_dropdown',
+                                                                                                                     options=[
+                                                                                                                         {'label': 'Residential',
+                                                                                                                          'value': 'Residential'},
+                                                                                                                         {'label': 'Business',
+                                                                                                                          'value': 'Business'},
+                                                                                                                         {'label': 'Industrial',
+                                                                                                                          'value': 'Industrial'},
+                                                                                                                         {'label': 'Government',
+                                                                                                                          'value': 'Government and Non-Profit'},
+                                                                                                                         {'label': 'Other sector',
+                                                                                                                          'value': 'Other sector'}
+                                                                                                                     ],
+                                                                                                                     value='Residential'),
+                      html.Button('Submit', id='submit-val', n_clicks=0),]
             + [html.Div(["initial child"], id="output-clientside",
                         style={"display": "none"})],
         )
@@ -209,8 +209,8 @@ app1.layout = html.Div(
                State(component_id='fig_month_dropdown', component_property='value'))
 def Update_month_by_sector(n_clicks, fig_month_dropdown):
 
-    print('Fig dropdown values')
-    print(fig_month_dropdown)
+    # print('Fig dropdown values')
+    # print(fig_month_dropdown)
 
     fig_month = px.bar(df_month_2022[df_month_2022["Year"] == 2022], x='Month', y='Grand Total',
                        hover_data=df_month_2022.columns[2:-

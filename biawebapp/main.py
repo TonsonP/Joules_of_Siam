@@ -12,7 +12,7 @@ from plotly.subplots import make_subplots
 from Calucation_electricity import calculate_electricity_charge
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField
+from wtforms import SubmitField, StringField, FloatField
 from wtforms.validators import DataRequired
 
 # from flask_ckeditor import CKEditor
@@ -152,8 +152,8 @@ def conspred():
 
 
 class MyForm(FlaskForm):
-    unit   = StringField('Energy used', validators=[DataRequired()])
-    ft      = StringField('Ft', validators=[DataRequired()])
+    unit    = FloatField('Energy used', validators=[DataRequired()])
+    ft      = FloatField('Ft', validators=[DataRequired()])
     submit  = SubmitField('confirm')
 
 @ server.route("/pricepred", methods = ['GET','POST'])
@@ -167,7 +167,10 @@ def pricepred():
         unit = form.unit.data 
         ft = form.ft.data
         price = calculate_electricity_charge(unit,ft)
+        price = "{:,.2f}".format(price)
         form.unit.data = ""
+        form.ft.data =""
+        print(price)
     return render_template('right-sidebarprice.html',form=form,unit=unit,ft=ft,price=price)
 
 

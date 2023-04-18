@@ -210,9 +210,9 @@ app1.layout = html.Div(
                         dcc.Graph(figure=historical_fig),
 
                         html.H2('Model RMSE Values'),
-                        html.Div('XGBoost RMSE: {} '.format(xgboost_rmse), style={'display': 'inline-block'}),
-                        html.Div('LSTM RMSE: {} '.format(lstm_rmse), style={'display': 'inline-block'}),
-                        html.Div('LASSO RMSE: {} '.format(lasso_rmse), style={'display': 'inline-block'}),
+                        html.Div('XGBoost RMSE: {} '.format(xgboost_rmse), style={'display': 'inline-block', 'margin-right': '20px'}),
+                        html.Div('LSTM RMSE: {} '.format(lstm_rmse), style={'display': 'inline-block', 'margin-right': '20px'}),
+                        html.Div('LASSO RMSE: {} '.format(lasso_rmse), style={'display': 'inline-block', 'margin-right': '20px'}),
                         
                         html.Div([
                         html.B("Energy Prediction (Unit: Gwh)"),], style={'margin-top': '20px'}),

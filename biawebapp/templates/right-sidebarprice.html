@@ -8,9 +8,21 @@
 				<div id="content">
 
 					<article>
-						Future Work
-					</article>
+						{{form.csrf_token}}
+						{{form.unit.label}}
+						{{form.unit()}}
+						{{form.ft.label}}
+						{{form.ft()}}
+						<br>
+						{{form.submit()}}
 
+						{% if name %}
+							Predict : {{price}}
+						{% else %}
+							Not Found
+						{% endif %}
+					</article>
+					
 				</div>
 			</div>
 			<div class="col-4 col-12-medium">

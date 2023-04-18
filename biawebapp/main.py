@@ -11,6 +11,10 @@ from forecast_function import forecasting
 from plotly.subplots import make_subplots
 from Calucation_electricity import calculate_electricity_charge
 
+from flask_wtf import FlaskForm
+from wtforms import SubmitField, StringField
+from wtforms.validators import DataRequired
+
 # from flask_ckeditor import CKEditor
 # import flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
@@ -18,6 +22,7 @@ from werkzeug.serving import run_simple
 
 # Server and Dashboard web app
 server = flask.Flask(__name__)
+server.config['SECRET_KEY'] = 'mykey'
 app1 = dash.Dash(requests_pathname_prefix="/app1/")
 app2 = dash.Dash(requests_pathname_prefix="/app2/")
 
@@ -119,9 +124,24 @@ def conspred():
     return render_template('right-sidebarpred.html')
 
 
-@ server.route("/pricepred")
+class MyForm(FlaskForm):
+    unit   = StringField('Energy used', validators=[DataRequired()])
+    ft      = StringField('Ft', validators=[DataRequired()])
+    submit  = SubmitField('confirm')
+
+@ server.route("/pricepred", methods = ['GET','POST'])
 def pricepred():
-    return render_template('right-sidebarprice.html')
+    unit  = False
+    ft = False
+    price = False
+    form = MyForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        unit = form.unit.data 
+        ft = form.ft.data
+        price = calculate_electricity_charge(unit,ft)
+        form.unit.data = ""
+    return render_template('right-sidebarprice.html',form=form,unit=unit,ft=ft,price=price)
 
 
 @ server.route('/render_dashboard')

@@ -210,11 +210,12 @@ app1.layout = html.Div(
                         dcc.Graph(figure=historical_fig),
 
                         html.H2('Model RMSE Values'),
-                        html.Div('XGBoost RMSE: {}'.format(xgboost_rmse)),
-                        html.Div('LSTM RMSE: {}'.format(lstm_rmse)),
-                        html.Div('LASSO RMSE: {}'.format(lasso_rmse)),
-
-                        html.B("Energy Prediction (Unit: Gwh)"),
+                        html.Div('XGBoost RMSE: {} '.format(xgboost_rmse), style={'display': 'inline-block'}),
+                        html.Div('LSTM RMSE: {} '.format(lstm_rmse), style={'display': 'inline-block'}),
+                        html.Div('LASSO RMSE: {} '.format(lasso_rmse), style={'display': 'inline-block'}),
+                        
+                        html.Div([
+                        html.B("Energy Prediction (Unit: Gwh)"),], style={'margin-top': '20px'}),
                         html.Hr(),
                         html.P('GDP_input_value'),
                         dcc.Input(id="GDP_input_value", type="number",

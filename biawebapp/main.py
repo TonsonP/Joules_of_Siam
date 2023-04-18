@@ -12,7 +12,7 @@ from plotly.subplots import make_subplots
 from Calucation_electricity import calculate_electricity_charge
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField, FloatField
+from wtforms import SubmitField, StringField
 from wtforms.validators import DataRequired
 
 # from flask_ckeditor import CKEditor
@@ -45,7 +45,7 @@ FT_prediction.set_index("Date", inplace=True)
 
 df_historical = pd.read_csv("./dataP/all_historical.csv")
 df_historical.set_index("Date", inplace=True)
-historical_fig = px.line(df_historical, x=df_historical.index, y=df_historical.columns.values, title='historical prediction')
+historical_fig = px.line(df_historical, x=df_historical.index, y=df_historical.columns.values, title='Historical trends and predictions for Peak load (Unit:MW)')
 
 
 df_norm = pd.read_csv("./dataP/Features_correlation.csv")
@@ -83,13 +83,13 @@ pietype_generation_fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
 pietype_generation_fig.update_layout(title=dict(text='Electricity generation Group by type', font=dict(size=20), automargin=False, yref='paper')
                                      )
 figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
-                    name='Electricity generation Group by type', hole=0.7), row=1, col=1)
+                    name='Electricity generation classified by fuel type (Year=2022)', hole=0.7), row=1, col=1)
 # Electricity consumption Group by sector
 labels = df_consumption_2022.index[2:7]
 values = df_consumption_2022[2:7]
 consumption_sector = go.Figure(data=[go.Pie(labels=labels, values=values)])
 consumption_sector.update_layout(
-    title=dict(text="Electricity consumption Group by sector",
+    title=dict(text="Electricity consumption classified by sector (Year=2022)",
                font=dict(size=20), automargin=False, yref='paper')
 )
 # check
@@ -149,8 +149,8 @@ def conspred():
 
 
 class MyForm(FlaskForm):
-    unit    = FloatField('Energy used', validators=[DataRequired()])
-    ft      = FloatField('Ft', validators=[DataRequired()])
+    unit   = StringField('Energy used', validators=[DataRequired()])
+    ft      = StringField('Ft', validators=[DataRequired()])
     submit  = SubmitField('confirm')
 
 @ server.route("/pricepred", methods = ['GET','POST'])
@@ -164,9 +164,7 @@ def pricepred():
         unit = form.unit.data 
         ft = form.ft.data
         price = calculate_electricity_charge(unit,ft)
-        price = "{:,.2f}".format(price)
         form.unit.data = ""
-        form.ft.data =""
     return render_template('right-sidebarprice.html',form=form,unit=unit,ft=ft,price=price)
 
 
@@ -209,7 +207,7 @@ app1.layout = html.Div(
                         dcc.Graph(figure=historical_fig),
 
 
-                        html.B("Energy Prediction"),
+                        html.B("Energy Prediction (Unit: Gwh)"),
                         html.Hr(),
                         html.P('GDP_input_value'),
                         dcc.Input(id="GDP_input_value", type="number",
@@ -282,7 +280,7 @@ def Update_month_by_sector(n_clicks, fig_month_dropdown):
                                                         1].values, color=fig_month_dropdown,
                        labels={'pop': 'Consumption seperated by month'}, height=400)
     fig_month.update_layout(
-        title=dict(text="Consumption seperated by month",
+        title=dict(text="Consumption seperated by month (Year=2022)",
                    font=dict(size=20), automargin=False, yref='paper')
     )
 

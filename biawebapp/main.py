@@ -108,6 +108,11 @@ def aboutus():
     # return "Hello, Flask!"
 
 
+@ server.route("/conseda")
+def conseda():
+    return render_template('right-sidebar.html')
+
+
 @ server.route('/render_dashboard')
 def render_dashboard():
     return flask.redirect('/app1')

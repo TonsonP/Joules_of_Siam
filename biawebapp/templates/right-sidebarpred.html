@@ -1,0 +1,78 @@
+{% include "header.html" %}
+
+<!-- Main -->
+<div id="main-wrapper">
+	<div class="container">
+		<div class="row gtr-200">
+			<div class="col-8 col-12-medium">
+				<div id="content">
+
+					<!-- Content -->
+					<article>
+
+						<h2>Electricity Consumption : Prediction</h2>
+
+						<p>The practice of estimating how much energy will be used at a certain future period is known
+							as energy consumption prediction. The ability to plan and deploy resources effectively,
+							which may decrease waste and expenses, makes this a crucial role for energy
+							organizations.<br>
+							For predicting energy usage, a number of techniques may be utilized, including LSTM, SARIMA,
+							ARIMA, and XGBoost. The choice of approach relies on the particular needs of the application
+							and each method has strengths and drawbacks of its own.</p>
+
+						<p>Recurrent neural networks (RNNs) of the LSTM (Long Short-Term Memory) kind are particularly
+							effective for time-series data, such as data on energy usage. The LSTM can manage non-linear
+							interactions between variables and can capture long-term dependencies in the data.<br>
+							Traditional statistical models that may be used for time-series forecasting include SARIMA
+							(Seasonal Autoregressive Integrated Moving Average) and ARIMA (Autoregressive Integrated
+							Moving Average). A variant of ARIMA called SARIMA was created particularly for time-series
+							data that displays seasonal trends. In order to provide forecasts, both models analyze the
+							data to find trends, cycles, and seasonal patterns.</p>
+
+
+						<p>The machine learning method XGBoost uses decision trees as its foundation. It is a well-liked
+							technique for predicting energy consumption since it can deal with non-linear interactions
+							and can recognize intricate patterns in the data.
+
+							Overall, the choice of approach for predicting energy consumption depends on a number of
+							variables, including the quantity and kind of data available, the needed level of forecast
+							accuracy, and the available computational resources.</p>
+
+						<h3>Result of Prediction</h3>
+						<p></p>
+
+					</article>
+
+				</div>
+			</div>
+			<div class="col-4 col-12-medium">
+				<div id="sidebar">
+
+					<!-- Sidebar -->
+					<section>
+						<h3>Interactive Dashboard</h3>
+						<p>Let interact</p>
+						<footer>
+							<a href="{{url_for('render_dashboard')}}" class="button icon solid fa-info-circle">Find out
+								more</a>
+						</footer>
+					</section>
+
+					<section>
+						<h3>Dataset</h3>
+						<p>The dataset that was collected between 2002 and 2022 from EPPO, BOT, EGAT, MEA, PEA, and TMD
+							is intended for use in a research study and is not to be used for commercial purposes.
+							Access to the dataset is available for free downloading.</p>
+						<footer>
+							<a href="https://github.com/TonsonP/Joules_of_Siam/tree/main/dataS"
+								class="button icon solid fa-info-circle">Download Dataset</a>
+						</footer>
+					</section>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% include "footer.html" %}

@@ -63,7 +63,7 @@ consumption_sector.update_layout(
     title=dict(text="Electricity consumption Group by sector",
                font=dict(size=20), automargin=False, yref='paper')
 )
-#check
+# check
 figsubpie.add_trace(go.Pie(labels=labels, values=values, showlegend=True,
                     name='Electricity consumption Group by sector', hole=0.7), row=1, col=2)
 
@@ -112,6 +112,11 @@ def aboutus():
 @ server.route("/conseda")
 def conseda():
     return render_template('right-sidebar.html')
+
+
+@ server.route("/conspred")
+def conspred():
+    return render_template('right-sidebarpred.html')
 
 
 @ server.route('/render_dashboard')

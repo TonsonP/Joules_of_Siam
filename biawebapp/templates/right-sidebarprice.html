@@ -8,16 +8,22 @@
 				<div id="content">
 
 					<article>
-						{{form.csrf_token}}
-						{{form.unit.label}}
-						{{form.unit()}}
-						{{form.ft.label}}
-						{{form.ft()}}
-						<br>
-						{{form.submit()}}
+						<h2>Electricity Price Prediction & Calculation</h2>
 
-						{% if name %}
-							Predict : {{price}}
+						<form action="" method="POST">
+							{{form.csrf_token}}
+							<h2>{{form.unit.label}}</h2>
+							{{form.unit()}}
+							<h2>{{form.ft.label}}</h2>
+							{{form.ft()}}
+							<br>
+							<br>
+							{{form.submit()}}
+						</form>
+						<br>
+						<br>
+						{% if price %}
+							<h2><b>Predict : {{price}} Baht </b></h2>
 						{% else %}
 							Not Found
 						{% endif %}

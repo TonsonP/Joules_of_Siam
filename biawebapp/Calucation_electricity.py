@@ -11,6 +11,9 @@ def calculate_electricity_charge(monthly_usage, ft_rate):
     # Define the tax rate as a fraction
     tax_rate = 0.07
     
+    # monthly_usage = int(monthly_usage)
+    # ft_rate = int(ft_rate)
+
     # Calculate the base tariff charge
     if monthly_usage <= 15:
         base_tariff = monthly_usage * tariff_0_15

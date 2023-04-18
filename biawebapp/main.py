@@ -119,6 +119,11 @@ def conspred():
     return render_template('right-sidebarpred.html')
 
 
+@ server.route("/pricepred")
+def pricepred():
+    return render_template('right-sidebarprice.html')
+
+
 @ server.route('/render_dashboard')
 def render_dashboard():
     return flask.redirect('/app1')

@@ -164,6 +164,7 @@ def pricepred():
         unit = form.unit.data 
         ft = form.ft.data
         price = calculate_electricity_charge(unit,ft)
+        price = "{:,.2f}".format(price)
         form.unit.data = ""
         form.ft.data =""
     return render_template('right-sidebarprice.html',form=form,unit=unit,ft=ft,price=price)

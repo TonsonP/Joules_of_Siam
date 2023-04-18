@@ -65,6 +65,9 @@ df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["GDP"], name=
 df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["Year"], name='Year',
                          line = dict(color='fuchsia', width=1, dash='dash')))
 
+xgboost_rmse = 390.68
+lstm_rmse = 29.41
+lasso_rmse = 373.65
 
 # check
 # This still temp
@@ -206,6 +209,10 @@ app1.layout = html.Div(
                         html.B("Historical Data"),
                         dcc.Graph(figure=historical_fig),
 
+                        html.H2('Model RMSE Values'),
+                        html.Div('XGBoost RMSE: {}'.format(xgboost_rmse)),
+                        html.Div('LSTM RMSE: {}'.format(lstm_rmse)),
+                        html.Div('LASSO RMSE: {}'.format(lasso_rmse)),
 
                         html.B("Energy Prediction (Unit: Gwh)"),
                         html.Hr(),

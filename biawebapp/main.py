@@ -42,6 +42,30 @@ with open('dataP/df_consumption_month_2022.pkl', 'rb') as file:
 FT_prediction = pd.read_csv("dataP/FT_full.csv")
 FT_prediction['Date'] = pd.to_datetime(FT_prediction['Date'])
 FT_prediction.set_index("Date", inplace=True)
+
+df_historical = pd.read_csv("./dataP/all_historical.csv")
+df_historical.set_index("Date", inplace=True)
+historical_fig = px.line(df_historical, x=df_historical.index, y=df_historical.columns.values, title='historical prediction')
+
+
+df_norm = pd.read_csv("./dataP/Features_correlation.csv")
+df_norm.set_index("Date", inplace=True)
+
+df_norm_fig = px.line(title="Features Correlation")
+df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["Peak"], name='Peak',
+                         line = dict(color='black', width=3, dash='dash')))
+df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["Population"], name='Population',
+                         line = dict(color='firebrick', width=1, dash='dot')))
+df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["Temperature"], name='Temperature',
+                         line = dict(color='green', width=1, dash='dot')))
+df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["CPI"], name='CPI',
+                         line = dict(color='navy', width=1, dash='dot')))
+df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["GDP"], name='GDP',
+                         line = dict(color='red', width=1, dash='dot')))
+df_norm_fig.add_trace(go.Scatter(x=df_norm.index.values, y=df_norm["Year"], name='Year',
+                         line = dict(color='fuchsia', width=1, dash='dash')))
+
+
 # check
 # This still temp
 # test2 = pd.read_csv('dataP/allmodelpredictedsaved.csv')
@@ -175,6 +199,14 @@ app1.layout = html.Div(
                 html.Div(
                     id="power predict",
                     children=[
+                        
+                        html.B("Features correlation"),
+                        dcc.Graph(figure=df_norm_fig),
+
+                        html.B("Historical Data"),
+                        dcc.Graph(figure=historical_fig),
+
+
                         html.B("Energy Prediction"),
                         html.Hr(),
                         html.P('GDP_input_value'),

@@ -1,5 +1,7 @@
 from xgboost import XGBRegressor
 from sklearn.neural_network import MLPRegressor
+from sklearn import linear_model
+from sklearn.preprocessing import MinMaxScaler
 
 import numpy as np
 import pandas as pd
@@ -15,24 +17,25 @@ class forecasting():
                  End_date = '2033-01'
                  ):
         
+        
         # Check date eligibility
         self.Check_date_eligibility(Start_date, End_date)
 
         # Get Static temperature values
-        file = open("./DataP/forecast_temperature.pkl", "rb")
+        file = open("./dataP/forecast_temperature.pkl", "rb")
         Temperature_forecast = pickle.load(file)
         self.Temperature_forecast = Temperature_forecast[0:len(self.Date)]
 
         # Get forecasted LSTM values
-        LSTM_forecast = pickle.load(open("./DataP/forecast_LSTM.pkl", "rb"))
+        LSTM_forecast = pickle.load(open("./dataP/forecast_LSTM.pkl", "rb"))
         self.LSTM_forecast = LSTM_forecast[0:len(self.Date)]
 
         # Get forecasted ARIMA values
-        ARIMA_forecast = pickle.load(open("./DataP/forecast_ARIMA.pkl", "rb"))
+        ARIMA_forecast = pickle.load(open("./dataP/forecast_ARIMA.pkl", "rb"))
         self.ARIMA_forecast = ARIMA_forecast[0:len(self.Date)]
 
         # Get forecasted SARIMA values
-        SARIMA_forecast = pd.read_csv("./DataP/SARIMA_forecasts.csv")["Peak Forecast"]
+        SARIMA_forecast = pd.read_csv("./dataP/SARIMA_forecasts.csv")["Peak Forecast"]
         self.SARIMA_forecast = SARIMA_forecast[0:len(self.Date)]
 
 
@@ -48,11 +51,11 @@ class forecasting():
 
         # Initial XGBoost model
         self.XGBoost_model = XGBRegressor()
-        self.XGBoost_model.load_model("./DataP/XGBoost_model.json")
+        self.XGBoost_model.load_model("./dataP/XGBoost_model.json")
 
-        # # Initial ANN model
-        # self.ANN_scaler = pickle.load(open('./Data/monthly_scaler.pkl', 'rb'))
-        # self.ANN_model = pickle.load(open('./Data/ANN_monthly.pkl', 'rb'))
+        # # Initial LASSO model
+        self.LASSO_scaler = pickle.load(open('./dataP/lasso_scaler.pkl', 'rb'))
+        self.LASSO_model = pickle.load(open('./dataP/lasso_reg.pkl', 'rb'))
 
         # Prepare data
         self.prepare_data()
@@ -139,16 +142,17 @@ class forecasting():
         
         self.XGBoost_features = features_dataframe
 
-        # Create features for ANN
-        self.ANN_features = features_dataframe[["Population", "Temperature", "CPI", "GDP"]].values
+        # Create features for LASSO
+        LASSO_features = features_dataframe[["Year", "Population", "Temperature", "CPI", "GDP"]].values
+        self.LASSO_features = self.LASSO_scaler.transform(LASSO_features)
 
     def get_prediction(self):
         
         # XG_Boost prediction
         self.XGBoost_prediction = self.XGBoost_model.predict(self.XGBoost_features)
-        
-        # ANN prediction
-        #self.ANN_prediction     = self.ANN_model.predict(self.ANN_scaler.transform(self.ANN_features))
+    
+        # LASSO prediction
+        self.LASSO_prediction     = self.LASSO_model.predict(self.LASSO_features)
 
     def plotting_data(self):
 
@@ -158,29 +162,23 @@ class forecasting():
         #                                     self.ARIMA_forecast, self.SARIMA_forecast]).T
         
         self.plotting_value = pd.DataFrame([self.Date, self.LSTM_forecast, 
-                                    self.XGBoost_prediction, self.ARIMA_forecast, 
-                                    self.SARIMA_forecast]).T
+                                    self.XGBoost_prediction, self.LASSO_prediction]).T
         
 
-
-        # self.energy_reserve_20 = 42909.9#self.LSTM_forecast.mean() * 1.20
-        # self.energy_reserve_35 = 49144.8#self.LSTM_forecast.mean() * 1.35
-        # self.energy_reserve_50 = self.LSTM_forecast.mean() * 1.50
-        self.plotting_value.columns = ["Date", "LSTM", "XGBoost", "ARIMA", "SARIMA"]
-        #self.plotting_value["ANN"] = self.plotting_value["ANN"].abs()
+        self.plotting_value.columns = ["Date", "LSTM", "XGBoost", "LASSO"]
 
         # Convert Datatype
         #self.plotting_value["Date"] = pd.to_datetime(df['Date'])
-        self.plotting_value[["LSTM", "XGBoost", "ARIMA", "SARIMA"]] = \
-        self.plotting_value[["LSTM", "XGBoost", "ARIMA", "SARIMA"]].astype(float)
+        self.plotting_value[["LSTM", "XGBoost", "LASSO"]] = \
+        self.plotting_value[["LSTM", "XGBoost", "LASSO"]].astype(float)
 
         # Insert current maximum capacity.
         self.plotting_value.insert(loc=len(self.plotting_value.columns), 
-                                   column="Maximum_capacity",
-                                   value= 49144.80
+                                   column="Capacity alert threshold",
+                                   value= 42909.9 * 0.85
                                    )
         
         self.plotting_value.insert(loc=len(self.plotting_value.columns), 
-                                   column="Maximum_capacity_wo_import",
+                                   column="Generation capacity",
                                    value= 42909.9
                                    )
